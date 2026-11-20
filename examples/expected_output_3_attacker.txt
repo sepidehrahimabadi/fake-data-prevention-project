@@ -1,0 +1,8 @@
+============================================================
+ATTACKER
+============================================================
+Traceback (most recent call last):
+  File "/home/claude/secure_certificate/attacker.py", line 38, in <module>
+    with open(os.path.join(CAPTURED_DIR, "signature.txt")) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/app/data/signature.txt'

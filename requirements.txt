@@ -1,0 +1,5 @@
+cryptography
+Flask
+requests
+PyJWT
+pymongo

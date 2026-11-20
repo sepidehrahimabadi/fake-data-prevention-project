@@ -1,0 +1,7 @@
+# Container of the ATTACKER (a third person with his own keys).
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY crypto_utils.py registration.py attacker.py ./
+CMD ["python", "-u", "attacker.py"]

@@ -1,0 +1,7 @@
+# Container of USER 1 (SENDER). It has NO receiver code and NO receiver keys.
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY crypto_utils.py registration.py sender.py ./
+CMD ["python", "-u", "sender.py"]

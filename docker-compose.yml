@@ -1,0 +1,72 @@
+# 6 containers: ca, mongo (database), receiver (User 2), sender-web and sender (User 1), attacker.
+# Every one has ITS OWN keys folder. They only talk through the network.
+# The KEY_PASSWORD values are only for the demo. In real life use secrets.
+
+services:
+
+  ca:                                # Certificate Authority + admin page: http://localhost:5001/admin
+    build: { context: ., dockerfile: Dockerfile.ca }
+    ports: ["5001:5001"]
+    environment:
+      ORGANIZATION_NAME: receiver
+      ORGANIZATION_SECRET: ${ORGANIZATION_SECRET}
+      ADMIN_USER: ${ADMIN_USER}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    volumes:
+      - ./ca_data:/app/ca_data
+      - ./trust:/app/trust
+
+  mongo:                             # The database of the receiver
+    image: mongo:7
+    ports: ["127.0.0.1:27018:27017"]
+    volumes:
+      - mongo_data:/data/db
+
+  receiver:                          # USER 2 - independent server
+    build: { context: ., dockerfile: Dockerfile.receiver }
+    ports: ["5003:5003"]
+    depends_on: [ca, mongo]
+    environment:
+      KEY_PASSWORD: ${RECEIVER_KEY_PASSWORD}
+      ORGANIZATION_SECRET: ${ORGANIZATION_SECRET}
+      MONGO_URL: mongodb://mongo:27017
+    volumes:
+      - ./receiver_keys:/app/keys
+      - ./receiver_data:/app/data
+      - ./trust:/app/trust:ro
+
+  sender-web:                        # USER 1 with a web page: http://localhost:5002
+    build: { context: ., dockerfile: Dockerfile.sender_web }
+    ports: ["5002:5002"]
+    depends_on: [ca, receiver]
+    environment:
+      KEY_PASSWORD: ${SENDER_KEY_PASSWORD}
+    volumes:
+      - ./sender_keys:/app/keys
+      - ./sender_data:/app/data
+      - ./trust:/app/trust:ro
+
+  sender:                            # USER 1 in the terminal - runs only when I ask (profile "tools")
+    build: { context: ., dockerfile: Dockerfile.sender }
+    profiles: ["tools"]
+    depends_on: [ca, receiver]
+    environment:
+      KEY_PASSWORD: ${SENDER_KEY_PASSWORD}
+    volumes:
+      - ./sender_keys:/app/keys
+      - ./sender_data:/app/data
+      - ./trust:/app/trust:ro
+
+  attacker:                          # The third person (runs only when I ask)
+    build: { context: ., dockerfile: Dockerfile.attacker }
+    profiles: ["tools"]
+    depends_on: [ca, receiver]
+    environment:
+      KEY_PASSWORD: ${ATTACKER_KEY_PASSWORD}
+    volumes:
+      - ./attacker_keys:/app/keys
+      - ./sender_data:/app/captured:ro
+      - ./trust:/app/trust:ro
+
+volumes:
+  mongo_data:

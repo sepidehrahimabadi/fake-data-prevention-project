@@ -1,0 +1,14 @@
+
+============================================================
+USER 1 - SENDER (Sepideh)
+============================================================
+
+REGISTER - generate my key pair
+[register] 'Sepideh' already has keys, I load them.
+Traceback (most recent call last):
+  File "/home/claude/secure_certificate/sender.py", line 55, in <module>
+    my_private_key = register_user(USER_NAME, KEYS_DIR, CA_URL, KEY_PASSWORD,
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/secure_certificate/registration.py", line 70, in register_user
+    raise RuntimeError(f"CA refused the registration: {answer.json().get('error')}")
+RuntimeError: CA refused the registration: bad full name (letters, spaces, . ' - only)
